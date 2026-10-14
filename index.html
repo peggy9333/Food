@@ -142,7 +142,7 @@ button.active {
   <h1>餐食卡無法領餐判斷系統</h1>
 
   <p class="subtitle">
-    <mark><strong>請先與客戶釐清無法領用當下的錯誤狀況</strong></<mark>
+    <mark><strong>請先與客戶釐清無法領用當下的錯誤狀況</strong></mark>
 	<br>再依序選擇以下情境，系統會自動顯示建議處理方式。
   </p>
 
@@ -165,7 +165,14 @@ const scenarios = {
   sensor: "無法感應／感應異常／顯示卡片失效",
   redeemed: "本日已兌領",
   card: "卡片非餐食卡或已過期",
-  day: "本日非兌領日"
+  day: "本日非兌領日",
+  receipt: "小白單重印方式"
+};
+
+const receiptSteps = {
+  "7-ELEVEN": "1.使用ibon機檯旁的電話聯繫ibon客服人員。\n2.告知對方時間、位置(如紅利>正負>高雄市餐食券。\n3.客服人員會提供一組兌換序號，依照畫面左上方進行輸入。\n4.即可重新產製小白單。",
+  "全家": "1.點選紅利 > 數位餐食券 > 列印異常。\n2.依流程操作。\n3.選擇靠卡感應/手輸卡號、學號(電話)後繼續流程。\n4.小白單補印完成。",
+  "萊爾富": "1.點選紅利>餐食券兌換 > 兌換券補印。\n2.依流程操作。\n3.點選要補印之餐食券資料(依該兌換日期)。\n4.小白單補印完成。"
 };
 
 let current = "sensor";
@@ -174,6 +181,11 @@ let answers = {};
 // 判斷建議處理方式
 function diagnose() {
   const s = answers;
+
+  // 小白單使用獨立流程，不進行原本的卡片判斷
+  if (current === "receipt") {
+    return null;
+}
 
   // 共用規則 1：卡片設定餐食卡
   if (s.setting === "未設定") {
@@ -316,6 +328,20 @@ function addQuestion(container, id, label, options) {
   container.appendChild(section);
 }
 
+// 顯示建議處理方式
+function showResult(container, message) {
+  const panel = document.createElement("section");
+  panel.className = "result";
+  const heading = document.createElement("h2");
+  heading.textContent = "建議處理方式";
+  const text = document.createElement("p");
+  text.className = "result-message";
+  text.textContent = message;
+  panel.appendChild(heading);
+  panel.appendChild(text);
+  container.appendChild(panel);
+}
+
 // 更新網頁
 function render() {
   const scenarioBox = document.getElementById("scenarios");
@@ -326,7 +352,7 @@ function render() {
   questionBox.innerHTML = "";
   resultBox.innerHTML = "";
 
-  // 顯示四種問題情境
+  // 顯示問題情境按鈕
   Object.entries(scenarios).forEach(([id, title], index) => {
     const button = document.createElement("button");
 
@@ -336,6 +362,25 @@ function render() {
 
     scenarioBox.appendChild(button);
   });
+
+// 新增流程：小白單重印方式
+  if (current === "receipt") {
+    // 顯示三家超商供使用者選擇
+    addQuestion(
+      questionBox,
+      "store",
+      "第二步：請選擇超商",
+      ["7-ELEVEN", "全家", "萊爾富"]
+    );
+
+// 選擇超商後，顯示該超商的操作步驟
+    if (answers.store) {
+      showResult(resultBox, receiptSteps[answers.store]);
+    }
+    // 結束這次畫面更新，不執行原本的卡片問答流程
+    return;
+  }
+
 
   // 第一項：卡片設定餐食卡
   addQuestion(
@@ -378,7 +423,7 @@ function render() {
     }
   }
 
-  // 只顯示建議處理方式，不顯示步驟或條件說明
+  // 顯示建議處理方式，不顯示步驟或條件說明
   const recommendation = diagnose();
 
   if (recommendation) {
