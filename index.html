@@ -146,7 +146,7 @@ button.active {
 	<br>再依序選擇以下情境，系統會自動顯示建議處理方式。
   </p>
 
-  <div class="section-title">第一步：釐清後請選擇問題情境<mark>(非依照領用錯誤記錄選擇)</mark></div>
+  <div class="section-title">第一步：釐清後請選擇問題情境<mark>(領用錯誤紀錄僅參考用，非依照領用錯誤記錄選擇)</mark></div>
 
   <div class="scenarios" id="scenarios"></div>
   <div id="questions"></div>
@@ -222,7 +222,7 @@ function diagnose() {
     }
 
     if (s.calendar === "正常" && s.success === "有") {
-      return "先嘗試重印小白單，若仍無效請更換其他通路嘗試";
+      return "告知目前看到領取成功的時間，建議詢問家人是否領過。\n若客戶確認沒有人領過，建議先嘗試補印小白單的方式，若仍無效可開BTS單確認。";
     }
 
     return null;
@@ -231,11 +231,11 @@ function diagnose() {
   // 無法感應／感應異常／顯示卡片失效
   if (current === "sensor") {
     if (s.success === "無") {
-      return "先嘗試手輸卡號+學號(台南餐食請輸入電話)方式領餐。\n若仍無效請更換其他通路嘗試";
+      return "先嘗試手輸卡號+學號(台南餐食請輸入電話)方式領餐。\n若仍無效請更換其他通路嘗試。\n若皆無法感應可依各卡片無法感應方式處理。";
     }
 
     if (s.success === "有") {
-      return "先嘗試重印小白單，若仍無效請更換其他通路嘗試";
+      return "告知目前看到領取成功的時間，建議詢問家人是否領過。\n若客戶確認沒有人領過，建議先嘗試補印小白單的方式，若仍無效可開BTS單確認。";
     }
   }
 
@@ -257,7 +257,7 @@ function diagnose() {
     }
 
     if (s.success === "有") {
-      return "先嘗試重印小白單，若仍無效請更換其他通路嘗試";
+      return "告知目前看到領取成功的時間，建議詢問家人是否領過。\n若客戶確認沒有人領過，建議先嘗試補印小白單的方式，若仍無效可開BTS單確認。";
     }
   }
 
